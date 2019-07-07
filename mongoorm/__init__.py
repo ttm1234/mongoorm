@@ -17,6 +17,9 @@ todo 写点 test
 ################## tutorial ############################
 
 
+# pip3 install mongoorm
+
+
 from mongoorm import register_connection, DocModel, Meta
 from mongoorm import fields
 from bson import ObjectId
