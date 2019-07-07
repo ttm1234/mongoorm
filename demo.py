@@ -73,6 +73,7 @@ def main():
     u.k5 = [1, 2]
     # u.k6 = {}
     u.k7 = ObjectId()
+    u.k8 = 1234
 
     u.save()
     print(u.k6)
@@ -120,4 +121,3 @@ def main():
 if __name__ == '__main__':
     conn_init()
     main()
-    d = dict()
