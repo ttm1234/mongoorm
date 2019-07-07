@@ -7,6 +7,8 @@ mongo orm python3
 
 1.0.0.dev2 is ok
 
+pip3 install mongoorm
+
 使用方法见 demo.py
 
 ```
