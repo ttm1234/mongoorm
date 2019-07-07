@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='mongoorm',
-    version='1.0.0.dev1',
+    version='1.0.0.dev2',
     description='A mongodb orm python3 project',
     url='https://github.com/ttm1234/mongoorm',
     author='ttm1234',
