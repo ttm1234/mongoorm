@@ -17,7 +17,7 @@ class _FieldBase(object):
             nullabled=True,
             choices=None,
             default=undefined_obj,
-            validation=None
+            validation=None,
     ):
         choices = copy.deepcopy(choices)
 

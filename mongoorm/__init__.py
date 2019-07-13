@@ -7,12 +7,15 @@
 2.查询和构造 model 时不做类型检查。只在保存时检查校验类型，如 .save 和 find_and_modify 等。
 3.查询到的 doc 如果 field 有 model 里尚未定义的则隐性保存并在 .save 时原样保存。
 
-todo pymongo 版本适配，当前 pymongo==3.7.2
-todo DocModel 继承
-todo 支持 user = User(_id=1, name='xxx', ...)
-todo mongodb 其他数据类型
+todo self.to_json(), incloude ObjectId()
+todo 查询的语法改进，age__gt=1 or Model.age >= 1
 todo 支持枚举
+todo mongodb 其他数据类型
 todo 写点 test
+todo pymongo 版本适配，当前 pymongo==3.7.2
+
+todo done!!!! 支持 user = User(_id=1, name='xxx', ...)
+todo done!!!! DocModel 继承
 
 ################## tutorial ############################
 

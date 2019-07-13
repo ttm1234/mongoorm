@@ -30,7 +30,14 @@ def conn_init():
         )
 
 
-class User(DocModel):
+class Model1(DocModel):
+    __inheritance__ = True
+
+    def log_my_id(self):
+        print('log_my_id', self._id)
+
+
+class User(Model1):
     # must have _id and required=True, as primary key
     _id = fields.FieldInteger(required=True)
 
@@ -67,6 +74,20 @@ class User(DocModel):
 
 
 def main():
+    u = User(
+        _id=2,
+        k1='afasf',
+        k2=None,
+        k3=False,
+        k4=999,
+        k5=[3, 6, 9],
+        k6=dict(),
+        k7=ObjectId(),
+        k8=0.12345
+    )
+    u.save()
+    print(u)
+
     u = User()
     u._id = 3
     u.k1 = 'afasf'
@@ -119,6 +140,38 @@ def main():
         return_after=True,
     )
     print(u, u._id, u.k2)
+    u.log_my_id()
+
+    # u = User.find({
+    #     'name': '张三',
+    #     'province': {
+    #         '$ne': '北京',
+    #     },
+    #     'age': {
+    #         '$gte': 20,
+    #     },
+    #     'phone': {
+    #         '$regex': '136',
+    #     },
+    #     'haha': {
+    #         '$exists': True,
+    #     },
+    # })
+    #
+    # u = User.find(
+    #     name='张三',
+    #     province__ne='北京',
+    #     age__gte=20,
+    #     phone__startswith='136',
+    #     haha__exists=True,
+    # )
+    # u = User.find(
+    #     User.name == '张三',
+    #     User.province != '北京',
+    #     User.age >= 20,
+    #     User.phone.startsWith('136'),
+    #     User.haha.exists(True),
+    # )
 
 
 if __name__ == '__main__':

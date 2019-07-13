@@ -26,13 +26,14 @@ class DocModel(PayloadDict):
 
     """
 
-    def __init__(self, *arg, **kwargs):
+    def __init__(self, **kwargs):
         """
+        :param kwargs: field key, value
         以下属性在 ModelMetaClass.new 中已被创造
         __mappings__  --> fields
         __payload__   --> content for fields
         """
-        super(DocModel, self).__init__(*arg, **kwargs)
+        self.update(kwargs)
 
     def get_dict(self):
         return copy.deepcopy(self.__payload__)
@@ -148,8 +149,7 @@ class DocModel(PayloadDict):
 
     @classmethod
     def _new_from_dict(cls, d):
-        m = cls()
-        m.__dict__['__payload__'] = d
+        m = cls(**d)
         return m
 
     @classmethod
