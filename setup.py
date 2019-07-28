@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='mongoorm',
-    version='1.0.0.dev2',
+    version='1.0.1.dev2',
     description='A mongodb orm python3 project',
     url='https://github.com/ttm1234/mongoorm',
     author='ttm1234',
@@ -11,7 +11,6 @@ setup(
     license='Anti 996',
     classifiers=[
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
