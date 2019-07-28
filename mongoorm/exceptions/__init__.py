@@ -30,6 +30,10 @@ class UndefinedError(BaseErr):
     pass
 
 
+class KeySyntaxError(BaseErr):
+    pass
+
+
 def put_cls_exception(e: BaseErr, cls):
     s = '<__class__ {} >'.format(cls.__name__)
     e.prepend_msg(s)

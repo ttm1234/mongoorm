@@ -1,10 +1,12 @@
 import copy
-from bson import ObjectId
+from bson import ObjectId as BsonObjectId
 
 from ..exceptions import UndefinedError, ModelValidErr
 
 undefined_obj = object()
 None_type = type(None)
+
+__all__ = ['String', 'Integer', 'Boolean', 'Float', 'List', 'Dict', 'ObjectId', 'Any', ]
 
 
 class _FieldBase(object):
@@ -126,7 +128,7 @@ class FieldObjectId(_FieldBase):
     def __init__(self, **kwargs):
 
         super(FieldObjectId, self).__init__(**kwargs)
-        self.type = ObjectId
+        self.type = BsonObjectId
 
 
 # todo 最好别用这个
@@ -136,3 +138,13 @@ class FieldAny(_FieldBase):
 
         super(FieldAny, self).__init__(**kwargs)
         self.type = None
+
+
+String = FieldString
+Integer = FieldInteger
+Boolean = FieldBoolean
+Float = FieldFloat
+List = FieldList
+Dict = FieldDict
+ObjectId = FieldObjectId
+Any = FieldAny

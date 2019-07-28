@@ -4,6 +4,8 @@ import warnings
 import six
 import copy
 
+from .filter_by import FilterBy
+from ..utils import JSONEncoder
 from ..cursor import Cursor
 from ..exceptions import UndefinedError, DocModelErr, ModelValidErr, put_inst_exception, put_cls_exception
 from ..model_meta_class import ModelMetaClass
@@ -12,7 +14,7 @@ from .payload_dict import PayloadDict
 
 
 @six.add_metaclass(ModelMetaClass)
-class DocModel(PayloadDict):
+class DocModel(PayloadDict, FilterBy):
     """
     eg.
     class User(DocModel):
@@ -40,6 +42,10 @@ class DocModel(PayloadDict):
 
     def to_json(self, **kwargs):
         d = self.get_dict()
+        if 'cls' not in kwargs:
+            kwargs.update(dict(
+                cls=JSONEncoder
+            ))
         return json.dumps(d, **kwargs)
 
     def save(self, force_insert=False, manipulate=True, check_keys=True, **kwargs):
@@ -169,6 +175,12 @@ class DocModel(PayloadDict):
         return r
 
     @classmethod
+    def filter_one_by(cls, **kwargs):
+        q = cls._filter_to_find(**kwargs)
+        r = cls.find_one(q)
+        return r
+
+    @classmethod
     def find(cls, *args, **kwargs):
         cursor_raw = cls._get_collection().find(*args, **kwargs)
         cur = Cursor(cursor_raw, cls)
@@ -182,6 +194,12 @@ class DocModel(PayloadDict):
         return r
 
     @classmethod
+    def filter_by(cls, **kwargs):
+        q = cls._filter_to_find(**kwargs)
+        r = cls.find(q)
+        return r
+
+    @classmethod
     def find_one_and_update(
             cls, filter, update, i_really_do_not_forget_set_in_update_arg=False,
             sort=None, upsert=False, return_after=False, array_filters=None, **kwargs
@@ -191,9 +209,14 @@ class DocModel(PayloadDict):
         if not i_really_do_not_forget_set_in_update_arg:
             for i in update.keys():
                 if not i.startswith('$'):
-                    exception = ModelValidErr(r'''you must have forgot $set in 'update' arg, 
+                    exception = ModelValidErr(r'''you must have forgot $set in 'update' arg,
                     such as {'$set': {k: v}}; or set i_really_do_not_forget_set_in_update=True??? (dangers!!!!)''')
                     raise put_cls_exception(exception, cls)
+
+        for k in filter.keys():
+            if k not in cls.__mappings__:
+                e = DocModelErr(r'''k ({}) not defined in Model '''.format(k))
+                raise put_cls_exception(e, cls)
 
         d = cls._get_collection().find_one_and_update(
             filter, update, sort=sort, upsert=upsert, return_document=return_after,
