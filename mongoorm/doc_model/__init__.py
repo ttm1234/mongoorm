@@ -33,9 +33,14 @@ class DocModel(PayloadDict, FilterBy):
         :param kwargs: field key, value
         以下属性在 ModelMetaClass.new 中已被创造
         __mappings__  --> fields
-        __payload__   --> content for fields
         """
+        self.__dict__['__payload__'] = dict()
         self.update(kwargs)
+
+    def __repr__(self):
+        s = super(DocModel, self).__repr__()
+        r = '{}-({})-'.format(s, self.to_json())
+        return r
 
     def get_dict(self):
         return copy.deepcopy(self.__payload__)
@@ -46,6 +51,8 @@ class DocModel(PayloadDict, FilterBy):
             kwargs.update(dict(
                 cls=JSONEncoder
             ))
+        if 'indent' not in kwargs:
+            kwargs['indent'] = 4
         return json.dumps(d, **kwargs)
 
     def save(self, force_insert=False, manipulate=True, check_keys=True, **kwargs):
@@ -155,7 +162,8 @@ class DocModel(PayloadDict, FilterBy):
 
     @classmethod
     def _new_from_dict(cls, d):
-        m = cls(**d)
+        m = cls()
+        m.__dict__['__payload__'].update(d)
         return m
 
     @classmethod

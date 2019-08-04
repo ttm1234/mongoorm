@@ -36,7 +36,6 @@ def handle_attr(name, attrs):
             mappings[k] = v
     attrs = new_attrs
     attrs['__mappings__'] = mappings
-    attrs['__payload__'] = dict()
 
     _new_cls_valid(name, attrs)
 
