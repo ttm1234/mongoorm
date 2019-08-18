@@ -31,8 +31,8 @@ class DocModel(PayloadDict, FilterBy):
     def __init__(self, **kwargs):
         """
         :param kwargs: field key, value
-        以下属性在 ModelMetaClass.new 中已被创造
-        __mappings__  --> fields
+        以下属性在 ModelMetaClass 中已被创造
+        cls.__mappings__  --> fields
         """
         self.__dict__['__payload__'] = dict()
         self.update(kwargs)
@@ -54,6 +54,11 @@ class DocModel(PayloadDict, FilterBy):
         if 'indent' not in kwargs:
             kwargs['indent'] = 4
         return json.dumps(d, **kwargs)
+
+    def really_delete(self, really_delete=False):
+        assert really_delete
+        coll = self._get_collection()
+        coll.delete_one({'_id': self._id})
 
     def save(self, force_insert=False, manipulate=True, check_keys=True, **kwargs):
 
@@ -161,6 +166,14 @@ class DocModel(PayloadDict, FilterBy):
         return coll
 
     @classmethod
+    def _valid_keys(cls, d: dict):
+        # todo and or ?????
+        for k in d.keys():
+            if k not in cls.__mappings__:
+                e = DocModelErr(r'''k ({}) not defined in Model '''.format(k))
+                raise put_cls_exception(e, cls)
+
+    @classmethod
     def _new_from_dict(cls, d):
         m = cls()
         m.__dict__['__payload__'].update(d)
@@ -176,34 +189,22 @@ class DocModel(PayloadDict, FilterBy):
         return m
 
     @classmethod
-    def find_one_by(cls,  *args, **kwargs):
-        assert len(args) == 0, 'find_one_by only access kwargs'
-        filter = kwargs
-        r = cls.find_one(filter)
-        return r
-
-    @classmethod
-    def filter_one_by(cls, **kwargs):
-        q = cls._filter_to_find(**kwargs)
-        r = cls.find_one(q)
-        return r
-
-    @classmethod
     def find(cls, *args, **kwargs):
         cursor_raw = cls._get_collection().find(*args, **kwargs)
         cur = Cursor(cursor_raw, cls)
         return cur
 
     @classmethod
-    def find_by(cls, *args, **kwargs):
-        assert len(args) == 0, 'filter_by only access kwargs'
-        filter = kwargs
-        r = cls.find(filter)
+    def filter_one_by(cls, **kwargs):
+        q = cls._filter_to_find(**kwargs)
+        cls._valid_keys(q)
+        r = cls.find_one(q)
         return r
 
     @classmethod
     def filter_by(cls, **kwargs):
         q = cls._filter_to_find(**kwargs)
+        cls._valid_keys(q)
         r = cls.find(q)
         return r
 
@@ -221,10 +222,7 @@ class DocModel(PayloadDict, FilterBy):
                     such as {'$set': {k: v}}; or set i_really_do_not_forget_set_in_update=True??? (dangers!!!!)''')
                     raise put_cls_exception(exception, cls)
 
-        for k in filter.keys():
-            if k not in cls.__mappings__:
-                e = DocModelErr(r'''k ({}) not defined in Model '''.format(k))
-                raise put_cls_exception(e, cls)
+        cls._valid_keys(filter)
 
         d = cls._get_collection().find_one_and_update(
             filter, update, sort=sort, upsert=upsert, return_document=return_after,

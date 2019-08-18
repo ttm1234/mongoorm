@@ -5,7 +5,7 @@ mongo orm python3
 
 [![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg)](https://github.com/996icu/996.ICU/blob/master/LICENSE)
 
-1.0.0.dev2 is ok
+1.0.0.dev4 is ok
 
 pip3 install mongoorm
 
@@ -44,30 +44,37 @@ def conn_init():
         )
 
 
-class User(DocModel):
+class Model1(DocModel):
+    __inheritance__ = True
+
+    def log_my_id(self):
+        print('log_my_id', self._id)
+
+
+class User(Model1):
     # must have _id and required=True, as primary key
-    _id = fields.FieldInteger(required=True)
+    _id = fields.Integer(required=True)
 
     # required=True means must have this field, but it can be None if nullabled=True
-    k1 = fields.FieldString(required=True)
+    k1 = fields.String(required=True)
 
     # choices=[1, 2, 3] is the same with choices=[1, 2, 3, None] if nullabled=True
-    k2 = fields.FieldInteger(required=False, choices=[1, 2, 3])
+    k2 = fields.Integer(required=False, choices=[1, 2, 3])
 
     # 1 is integer, not boolean, and True is boolean, not integer
-    k3 = fields.FieldBoolean(required=False, nullabled=False)
+    k3 = fields.Boolean(required=False, nullabled=False)
 
     # default only works when the required=False
-    k4 = fields.FieldFloat(required=False, default=0.1)
+    k4 = fields.Float(required=False, default=0.1)
 
     # validation only works when the type_check=True in Meta class
-    k5 = fields.FieldList(required=False, validation=lambda a: len(a) > 1)
+    k5 = fields.List(required=False, validation=lambda a: len(a) > 1)
 
     # if required=False and default is undefined, there is no this field in mongodb's document after .save
-    k6 = fields.FieldDict(required=False, default=dict)
+    k6 = fields.Dict(required=False, default=dict)
 
     # FieldObjectId is used for mongodb objectId data
-    k7 = fields.FieldObjectId()
+    k7 = fields.ObjectId()
 
     # I don't suggest to use the FieldAny, 过于魔性
     k8 = fields.FieldAny()
@@ -81,6 +88,21 @@ class User(DocModel):
 
 
 def main():
+    u = User(
+        _id=2,
+        k1='afasf',
+        k2=None,
+        k3=False,
+        k4=999,
+        k5=[3, 6, 9],
+        k6=dict(),
+        k7=ObjectId(),
+        k8=0.12345
+    )
+    u.save()
+    print(u)
+    print('to_json', u.to_json())
+
     u = User()
     u._id = 3
     u.k1 = 'afasf'
@@ -102,37 +124,58 @@ def main():
     us = us.skip(0).limit(999)
     print(us[0])
 
-    us = User.find_by(
-        k1='afasf',
-    )
-    print(us[0])
-
-    for u in us:
-        print(u._id, u.k1, u.k2)
-
     u = User.find_one({
         'k1': 'afasf',
     })
     print(u)
 
-    u = User.find_one_by(
-        k1='afasf',
-    )
-    print(u)
-
     u = User.find_one_and_update(
         {
-            'k1': 'afasf',
+            '_id': 3,
         },
         {
             '$set': {
-                'k2': 666
+                'k2': 777
             },
         },
         upsert=False,
         return_after=True,
     )
-    print(u, u._id, u.k2)
+    print(u, u._id, u.k2, '===')
+    u.log_my_id()
+
+    # u = User.find({
+    #     'name': '张三',
+    #     'province': {
+    #         '$ne': '北京',
+    #     },
+    #     'age': {
+    #         '$gte': 20,
+    #     },
+    #     'phone': {
+    #         '$regex': '136',
+    #     },
+    #     'haha': {
+    #         '$exists': True,
+    #     },
+    # })
+    #
+    u = User.filter_one_by(
+        k1__contains='as',
+        k2__gt=0,
+        k7__exists=True,
+    )
+    print(u, 'filter_one_by')
+
+    us = User.filter_by(
+        k1__contains='as',
+    ).all()
+    print(us, us.count(), 'filter_by')
+    us[0].really_delete(really_delete=True)
+    u = User.filter_by(
+        k1__contains='as',
+    ).first()
+    print(u)
 
 
 if __name__ == '__main__':

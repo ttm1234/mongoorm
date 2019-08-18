@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='mongoorm',
-    version='1.0.1.dev3',
+    version='1.0.1.dev4',
     description='A mongodb orm python3 project',
     url='https://github.com/ttm1234/mongoorm',
     author='ttm1234',
@@ -20,7 +20,7 @@ setup(
     keywords='mongodb orm python python3',
     packages=[
         'mongoorm', 'mongoorm.doc_model', 'mongoorm.exceptions',
-        'mongoorm.extensions', 'mongoorm.fields'
+        'mongoorm.extensions', 'mongoorm.fields',
     ],
     install_requires=["pymongo>=3.7", "six", ],
     include_package_data=True,

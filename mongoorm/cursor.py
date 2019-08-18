@@ -77,6 +77,15 @@ class Cursor(object):
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._obj.close()
 
+    ########################################################
+
+    def first(self):
+        if self.count() == 0:
+            return None
+        return self[0]
+
+    def all(self):
+        return self
 
 
 '''

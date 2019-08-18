@@ -155,15 +155,13 @@ def main():
 
     us = User.filter_by(
         k1__contains='as',
-    )
+    ).all()
     print(us, us.count(), 'filter_by')
-    # u = User.find(
-    #     User.name == '张三',
-    #     User.province != '北京',
-    #     User.age >= 20,
-    #     User.phone.startsWith('136'),
-    #     User.haha.exists(True),
-    # )
+    us[0].really_delete(really_delete=True)
+    u = User.filter_by(
+        k1__contains='as',
+    ).first()
+    print(u)
 
 
 if __name__ == '__main__':
