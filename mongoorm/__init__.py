@@ -19,13 +19,13 @@ todo aio_mongoorm
 todo 查询的语法改进Model.age >= 1
 todo pymongo 版本适配，当前 pymongo==3.7.2
 
-todo done!!!! find one and update 中对应 update 中的kv进行类型校验
 todo done!!!! 增加 filter_by[_one] 支持 age__gt=1 语法
 todo done!!!! self.to_json(), incloude ObjectId()
 todo done!!!! 支持 user = User(_id=1, name='xxx', ...)
 todo done!!!! DocModel 继承
 todo done!!!! self.really_delete
 todo done!!!! 查询语法校验 key 是否定义
+todo done!!!! find one and update 中对应 update 中的kv进行类型校验
 
 ################################# tutorial ######################################
 
