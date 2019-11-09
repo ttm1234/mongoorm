@@ -17,9 +17,27 @@ from .payload_dict import PayloadDict
 class DocModel(PayloadDict, FilterBy):
     """
     eg.
+    from mongoorm import register_connection, DocModel, Meta
+    from mongoorm import fields
+
+    db_aliases = {
+        'db_alias-db_test1': 'db_test1',
+        'db_alias-db_test2': 'db_test2',
+    }
+    for db_alias, database in db_aliases.items():
+        register_connection(
+            db_alias=db_alias,
+            database=database,
+            host='localhost',
+            port=27017,
+            # username='xxxxxx',
+            # password='xxxxxx',
+            # authSource='admin',
+        )
+
     class User(DocModel):
-        _id = FieldInteger()
-        name = FieldString()
+        _id = fields.Integer()
+        name = fields.String()
 
          meta = Meta(
             db_alias='db_alias-db_test1',
@@ -169,7 +187,8 @@ class DocModel(PayloadDict, FilterBy):
     def _valid_keys(cls, d: dict):
         # todo and or ?????
         for k in d.keys():
-            if k not in cls.__mappings__:
+            k0 = k.split('.')[0]
+            if k0 not in cls.__mappings__:
                 e = DocModelErr(r'''k ({}) not defined in Model '''.format(k))
                 raise put_cls_exception(e, cls)
 
@@ -216,11 +235,13 @@ class DocModel(PayloadDict, FilterBy):
         assert 'return_document' not in kwargs
 
         if not i_really_do_not_forget_set_in_update_arg:
-            for i in update.keys():
-                if not i.startswith('$'):
+            for k, v in update.items():
+                if not k.startswith('$'):
                     exception = ModelValidErr(r'''you must have forgot $set in 'update' arg,
                     such as {'$set': {k: v}}; or set i_really_do_not_forget_set_in_update=True??? (dangers!!!!)''')
                     raise put_cls_exception(exception, cls)
+
+                cls._valid_keys(v)
 
         cls._valid_keys(filter)
 
@@ -236,6 +257,29 @@ class DocModel(PayloadDict, FilterBy):
     @classmethod
     def aggregate(cls, pipeline, **kwargs):
         r = cls._get_collection().aggregate(pipeline, **kwargs)
+        return r
+
+    @classmethod
+    def save_many_from_instances(cls, instances, ordered=False, bypass_document_validation=False):
+        for i in instances:
+            if not isinstance(i, cls):
+                exception = ModelValidErr(r'''in method 'save_many_from_instances', 
+                instances must all is instance of cls''')
+                raise put_cls_exception(exception, cls)
+
+        docs = []
+        for m in instances:
+            self = m
+            if self._use_schame:
+                # 数据补全
+                self._schame_completion()
+            if self._type_check:
+                # 检查类型
+                self._check_field_type(undefined_is_ok=True)
+
+            docs.append(m.__payload__)
+
+        r = cls._get_collection().insert_many(docs, ordered=ordered, bypass_document_validation=bypass_document_validation)
         return r
 
 

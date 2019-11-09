@@ -43,11 +43,12 @@ class FilterBy(object):
     @classmethod
     def _filter_to_find(cls, **cond):
         """
-        :param cond: {a=1, c__gt=2, ...}
+        :param cond: {a=1, c__gt=2, c__lt=3...}
         :return: {
             'a': 1,
             'c': {
                 '$gt': 2,
+                '$lt': 3,
             }
         }
         """
@@ -56,7 +57,14 @@ class FilterBy(object):
             assert isinstance(k, str)
             if '__' in k:
                 d = d_from_kv(k, v)
-                r.update(d)
+                k, v = None, None
+                for a, b in d.items():
+                    k, v = a, b
+                    break
+                if k in r:
+                    r[k].update(v)
+                else:
+                    r.update(d)
             else:
                 r[k] = v
 

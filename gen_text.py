@@ -1,8 +1,3 @@
-
-
-
-
-
 def open_txt(filename):
     with open(filename, 'r', encoding='utf-8') as f:
         r = f.read()

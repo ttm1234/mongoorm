@@ -4,6 +4,8 @@
 from mongoorm import register_connection, DocModel, Meta
 from mongoorm import fields
 from bson import ObjectId
+import copy
+
 
 config = {
     'host': 'localhost',
@@ -121,7 +123,7 @@ def main():
         },
         {
             '$set': {
-                'k2': 777
+                'k2': 777,
             },
         },
         upsert=False,
@@ -162,6 +164,18 @@ def main():
         k1__contains='as',
     ).first()
     print(u)
+
+    u1 = User.filter_one_by()
+    us = []
+    for i in range(21, 30, 1):
+        u = User()
+        u.__dict__['__payload__'] = copy.deepcopy(u1.__dict__['__payload__'])
+        u._id = i
+        u.k2 = 1
+        us.append(u)
+
+    r = User.save_many_from_instances(us)
+    print('save_many_from_instances', r)
 
 
 if __name__ == '__main__':

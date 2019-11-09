@@ -7,10 +7,10 @@ from .meta import Meta
 [![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg)](https://github.com/996icu/996.ICU/blob/master/LICENSE)
 
 核心理念：
-1.定义 orm 映射关系，在此基础上尽量沿用和保留 pymongo 方法和函数
-2.查询和构造 model 时不做类型检查。只在保存时检查校验类型，如 .save 和 find_and_modify 和 find_one_and_update 等。
-3.查询到的 doc 如果 field 有 model 里尚未定义的则隐性保存并在 .save 时原样保存。
+1.查询和构造 model 时不做类型检查。只在保存时检查校验类型，如 .save 和 find_and_modify 和 find_one_and_update 等。
+2.查询到的 doc 如果 field 有 model 里尚未定义的则隐性保存并在 .save 时原样保存。
 
+todo find one and update 中对应 update 中的kv进行类型校验
 todo 创建 model 的 db_alias-collection 不能重复
 todo order_by('-age')
 todo 查询 filter_by[_one] 中支持 and or 等操作
@@ -35,6 +35,8 @@ todo done!!!! 查询语法校验 key 是否定义
 from mongoorm import register_connection, DocModel, Meta
 from mongoorm import fields
 from bson import ObjectId
+import copy
+
 
 config = {
     'host': 'localhost',
@@ -152,7 +154,7 @@ def main():
         },
         {
             '$set': {
-                'k2': 777
+                'k2': 777,
             },
         },
         upsert=False,
@@ -193,6 +195,18 @@ def main():
         k1__contains='as',
     ).first()
     print(u)
+
+    u1 = User.filter_one_by()
+    us = []
+    for i in range(21, 30, 1):
+        u = User()
+        u.__dict__['__payload__'] = copy.deepcopy(u1.__dict__['__payload__'])
+        u._id = i
+        u.k2 = 1
+        us.append(u)
+
+    r = User.save_many_from_instances(us)
+    print('save_many_from_instances', r)
 
 
 if __name__ == '__main__':
