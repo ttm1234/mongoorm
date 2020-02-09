@@ -1,5 +1,6 @@
 import json
 import warnings
+import bson
 
 import six
 import copy
@@ -194,8 +195,15 @@ class DocModel(PayloadDict, FilterBy):
 
     @classmethod
     def _new_from_dict(cls, d):
+        bson64_keys = []
         m = cls()
+        # bson.int64.Int64 to int
+        for k, v in d.items():
+            if isinstance(v, bson.int64.Int64):
+                bson64_keys.append(k)
         m.__dict__['__payload__'].update(d)
+        for k in bson64_keys:
+            m.__dict__['__payload__'][k] = int(m.__dict__['__payload__'][k])
         return m
 
     @classmethod

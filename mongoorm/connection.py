@@ -4,10 +4,10 @@ from .extensions import MongoClient
 __author__ = 'ttm1234'
 
 _singleton_connections = {
-    # (host, port, ): MongoClient()
+    # (host, port, ): MongoClient(),
 }
 _connections = {
-    # db_alias: DatabaseConn()
+    # db_alias: DatabaseConn(),
 }
 
 __all__ = ['register_connection', 'get_database_conn', ]

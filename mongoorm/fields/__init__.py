@@ -20,6 +20,7 @@ class _FieldBase(object):
             choices=None,
             default=undefined_obj,
             validation=None,
+            rich_default=undefined_obj,
     ):
         choices = copy.deepcopy(choices)
 
@@ -28,6 +29,7 @@ class _FieldBase(object):
         self.choices = choices
         self.default = default
         self.validation = validation
+        self.rich_default = rich_default
         self.type = None
         # 冗余
         self.name = None
@@ -35,11 +37,20 @@ class _FieldBase(object):
 
         self.init_valid()
 
+    @property
+    def has_rich_default(self):
+        r = self.rich_default is not undefined_obj
+        return r
+
     def init_valid(self):
         for i in ('required', 'nullabled'):
             assert isinstance(getattr(self, i), bool)
         assert self.choices is None or isinstance(self.choices, (list, tuple, None_type))
         assert self.validation is None or callable(self.validation)
+        if self.rich_default is not undefined_obj:
+            if self.default is not undefined_obj and self.default != self.rich_default:
+                print('_FieldBase rich_default will overwrite default')
+            self.default = self.rich_default
 
     def validate(self, v):
         if not self.nullabled and v is None:

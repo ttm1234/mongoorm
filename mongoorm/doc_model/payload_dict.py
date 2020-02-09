@@ -15,7 +15,16 @@ class PayloadDict(object):
 
     def __getitem__(self, k):
         try:
-            return self.__payload__[k]
+            # todo done!!!! big number to int?????
+            if k in self.__payload__:
+                return self.__payload__[k]
+            else:
+                field = self.__mappings__.get(k)
+                if field is not None and field.has_rich_default:
+                    r = field.rich_default
+                    return r
+                else:
+                    return self.__payload__[k]
         except KeyError:
             self._raise_attr_error(k)
 

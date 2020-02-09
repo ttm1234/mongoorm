@@ -49,6 +49,32 @@ class Cursor(object):
         self._obj = self._obj.sort(key_or_list, direction=direction)
         return self
 
+    def order_by(self, key_or_list):
+        if isinstance(key_or_list, str):
+            keys = [key_or_list, ]
+        elif not isinstance(key_or_list, (list, tuple, )):
+            raise TypeError("{} key_or_list -{}- must be str or list by str ".format(self._cls.__name__, key_or_list))
+
+        keys2 = []
+        for k in keys:
+            cell = self._cell_from_k(k)
+            keys2.append(cell)
+
+        return self.sort(keys2)
+
+    def _cell_from_k(self, k):
+        if k.startswith('-'):
+            k = k[1:]
+            fangxiang = -1
+        else:
+            fangxiang = 1
+
+        if k not in self._cls.__mappings__:
+            raise TypeError("{} in order_by, k -{}- must be in fields ".format(self._cls.__name__, k))
+
+        r = (k, fangxiang, )
+        return r
+
     def count(self, with_limit_and_skip=False):
         r = self._obj.count(with_limit_and_skip=with_limit_and_skip)
         return r

@@ -67,11 +67,28 @@ class User(Model1):
     # I don't suggest to use the FieldAny, 过于魔性
     k8 = fields.FieldAny()
 
+    k9 = fields.Integer(required=False)
+
     meta = Meta(
         db_alias='db_alias-db_test1',
         collection='test_user',
         use_schema=True,
         type_check=True,
+    )
+
+
+class UserWithSameCollection(DocModel):
+    # must have _id and required=True, as primary key
+    _id = fields.Integer(required=True)
+
+    k_not_found = fields.Integer(required=False, rich_default=9)
+
+    meta = Meta(
+        db_alias='db_alias-db_test1',
+        collection='test_user',
+        use_schema=True,
+        type_check=True,
+        collection_name_repeated=True,
     )
 
 
@@ -85,7 +102,7 @@ def main():
         k5=[3, 6, 9],
         k6=dict(),
         k7=ObjectId(),
-        k8=0.12345
+        k8=0.12345,
     )
     u.save()
     print(u)
@@ -101,8 +118,10 @@ def main():
     # u.k6 = {}
     u.k7 = ObjectId()
     u.k8 = 1234
+    u.k9 = 1999999999999
 
     u.save()
+    print('type(u.k9)-before', type(u.k9))
     print(u.k6)
 
     us = User.find({
@@ -112,10 +131,19 @@ def main():
     us = us.skip(0).limit(999)
     print(us[0])
 
+    us = User.find({})
+    us = us.order_by('-_id')
+    print('order by', us[0])
+
     u = User.find_one({
-        'k1': 'afasf',
+        '_id': 3,
     })
     print(u)
+    print('type(u.k9)-after', type(u.k9))
+
+    u = UserWithSameCollection.find_one({})
+    print(u)
+    print('k_not_found', type(u.k_not_found))
 
     u = User.find_one_and_update(
         {
@@ -165,17 +193,17 @@ def main():
     ).first()
     print(u)
 
-    u1 = User.filter_one_by()
-    us = []
-    for i in range(21, 30, 1):
-        u = User()
-        u.__dict__['__payload__'] = copy.deepcopy(u1.__dict__['__payload__'])
-        u._id = i
-        u.k2 = 1
-        us.append(u)
-
-    r = User.save_many_from_instances(us)
-    print('save_many_from_instances', r)
+    # u1 = User.filter_one_by()
+    # us = []
+    # for i in range(121, 130, 11):
+    #     u = User()
+    #     u.__dict__['__payload__'] = copy.deepcopy(u1.__dict__['__payload__'])
+    #     u._id = i
+    #     u.k2 = 1
+    #     us.append(u)
+    #
+    # r = User.save_many_from_instances(us)
+    # print('save_many_from_instances', r)
 
 
 if __name__ == '__main__':

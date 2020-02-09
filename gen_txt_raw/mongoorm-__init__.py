@@ -10,8 +10,7 @@ from .meta import Meta
 1.查询和构造 model 时不做类型检查。只在保存时检查校验类型，如 .save 和 find_and_modify 和 find_one_and_update 等。
 2.查询到的 doc 如果 field 有 model 里尚未定义的则隐性保存并在 .save 时原样保存。
 
-todo 创建 model 的 db_alias-collection 不能重复
-todo order_by('-age')
+todo a = 1, a__lt = 1
 todo 查询 filter_by[_one] 中支持 and or 等操作
 todo 支持枚举
 todo mongodb 其他数据类型
@@ -26,7 +25,10 @@ todo done!!!! DocModel 继承
 todo done!!!! self.really_delete
 todo done!!!! 查询语法校验 key 是否定义
 todo done!!!! find one and update 中对应 update 中的kv进行类型校验
-
+todo done!!!! big number bson.Int64 to int
+todo done!!!! 创建 model 的 db_alias-collection 不能重复
+todo done!!!! add rich_default
+todo done!!!! order_by('-age')
 ################################# tutorial ######################################
 
 {demo}
