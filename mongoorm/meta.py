@@ -4,8 +4,7 @@ class Meta(object):
                  db_alias, collection,
                  use_schema=True,
                  type_check=True,
-                 collection_name_repeated=False,
-                 ):
+                 collection_name_repeated=False):
         self.db_alias = db_alias
         self.collection = collection
         self.use_schema = use_schema
