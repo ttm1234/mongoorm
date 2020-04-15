@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='mongoorm',
-    version='1.0.3',
+    version='1.0.4',
     description='A mongodb orm python3 project',
     url='https://github.com/ttm1234/mongoorm',
     author='ttm1234',
@@ -25,3 +25,9 @@ setup(
     install_requires=["pymongo>=3.7", "six", ],
     include_package_data=True,
 )
+
+
+'''
+python3 setup.py bdist_wheel
+python3 setup.py sdist bdist_wheel upload
+'''
